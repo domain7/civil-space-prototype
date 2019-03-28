@@ -7136,6 +7136,9 @@ h1 {
 strong {
   font-weight: 900 !important; }
 
+a.iteration-link {
+  cursor: pointer; }
+
 .nav-tabs {
   border-bottom: 1px solid #636363 !important; }
   .nav-tabs .nav-item {

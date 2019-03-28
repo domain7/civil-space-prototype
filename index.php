@@ -90,7 +90,7 @@
                                                     </div>
                                                     <div class='row'>
                                                         <div class='col-md-12'>
-                                                            <p class='label p-2 m-0'>Idea iterations <strong>18</strong></p>
+                                                            <p class='label p-2 m-0'><a class='iteration-link' v-on:click.stop="ideaIteration()">Idea iterations <strong>18</strong></a></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -134,13 +134,55 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="iterate-idea-modal">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header border-bottom-0">
+                        <button type="button" class="close" data-dismiss="modal"> <span>×</span> </button>
+                    </div>
+                    <div class="modal-body p-5">
+                            <h5>You said No to:</h5>
+                            <h4 class="modal-title mb-3 ">Idea title....</h4>
+                            <h5 class="mb-2">What one thing would you change to make this an idea you could say Yes to?</h5>
+                            <form>
+                                <div class="form-group"><textarea class="form-control" rows="5"></textarea></div>
+                            </form>
+                            <p class="p-0">
+                                <strong>Other suggestions:</strong>
+                            </p>
+                        <div class="container">
+                            <div class="row border-top border-bottom py-2 align-items-center">
+                                <div class="col-md-9 col-auto mr-auto pl-0">
+                                    <label><small><span class="pr-2">3 hours ago </span><strong>User name</strong></small></label>
+                                    <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad </p>
+                                </div>
+                                <div class="col-md-2 col-auto">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col-9"><a class="btn btn-outline-primary btn-block btn-lg" href="#"><i class="fa fa-fw fa-thumbs-up"></i></a></div>
+                                        <div class="col-3 text-center">
+                                            <span class="label">48</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4 text-center justify-content-center">
+                                <div class="col-sm-6 col-lg-4">
+                                    <button type="button" class="btn btn-primary btn-md btn-block mb-2">Submit Your Idea</button>
+                                    <button type="button" class="btn btn-link" data-dismiss="modal">Skip</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="py-5" id="footer">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
                     <div class="row">
-                        <div class="col-md-6"><a class="btn btn-outline-secondary btn-lg btn-block" href="#">Pervious</a></div>
+                        <div class="col-md-6"><a class="btn btn-outline-secondary btn-lg btn-block" href="#">Previous</a></div>
                         <div class="col-md-6"><a class="btn btn-secondary btn-lg btn-block" href="#">Next</a></div>
                     </div>
                 </div>
@@ -249,6 +291,10 @@
                         })
                         .then(function (response) {
 
+                            if (type == 'dislike'){
+                                $('#iterate-idea-modal').modal('toggle');
+                            }
+
 
                             axios.get('api/getIdeas.php')
                             .then(response => {
@@ -263,6 +309,11 @@
 
 
 
+                    },
+                    ideaIteration: function(ideaID){
+                        if ($('#iterate-idea-modal').not('.show')){
+                            $('#iterate-idea-modal').modal('toggle');
+                        }
                     }
                 }
             })
