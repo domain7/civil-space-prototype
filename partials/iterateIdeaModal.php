@@ -10,7 +10,7 @@
                     <h5 class="mb-2">What one thing would you change to make this an idea you could say Yes to?</h5>
                     <form>
                         <div class="form-group"><textarea class="form-control" rows="5" v-model='comment'></textarea></div>
-                        <input type='hidden' v-model='id' value='modalID'>
+                        <!-- <input type='hidden' v-model='id' value='modalID'> -->
                     </form>
                     <p class="p-0">
                         <strong>Other suggestions:</strong>

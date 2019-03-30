@@ -83,7 +83,7 @@
                                                         </div>
                                                     </div>
                                                     <div class='row no-gutters align-items-center ml-2 mb-1'>
-                                                        <div class='col-7'><button class='btn btn-outline-primary btn-lg btn-block dislike' @click="dislike(idea.id); sendTitle(idea.title);"><i class='fa fa-fw fa-thumbs-down fa-flip-horizontal'></i></button></div>
+                                                        <div class='col-7'><button class='btn btn-outline-primary btn-lg btn-block dislike' @click="dislike(idea.id); sendTitle(idea.title); sendID(idea.id)"><i class='fa fa-fw fa-thumbs-down fa-flip-horizontal'></i></button></div>
                                                         <div class='col-3 text-center'>
                                                             <span class='label'>{{ idea.dislikes }}</span>
                                                         </div>
@@ -277,26 +277,29 @@
 
 
                     },
-                    newIteration: function(){
+                    newIteration: function(ideaID){
 
                         if(this.comment != ''){
 
+
                             let formData = new FormData();
                             formData.append("comment", this.comment)
-                            formData.append("ideaID", this.ideaID)
+                            formData.append("ideaID", app.modalID)
 
 
                             axios({
+                                
                                 method: 'post',
                                 url: 'api/newIteration.php',
                                 data: formData,
                                 config: {headers: {'Content-Type': 'multipart/form-data'}}
+                                
                             })
                             .then(function (response) {
                                 // Close the modal
                                 $('#iterate-idea-modal').modal('toggle');
 
-                                // Fetch records  
+                                // Fetch idea records again  
                                 axios.get('api/getIdeas.php')
                                 .then(response => {
                                     app.ideas = response.data
