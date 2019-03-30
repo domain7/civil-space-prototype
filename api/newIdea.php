@@ -11,10 +11,10 @@ $data = json_decode(file_get_contents("php://input"));
 
 $request = $_POST["request"];
 
-console_log($_POST);
+console_log($_POST,'test');
 
 // add idea
-if($request == 1){
+if($request == "new"){
   $title = $_POST["title"];
   $description = $_POST["description"];
   $username = $_POST["username"];
@@ -22,13 +22,13 @@ if($request == 1){
   mysqli_query($con,"INSERT INTO ideas(title,description,username,email) VALUES('".$title."','".$description."','".$username."','".$email."')");
   
   exit;
-} elseif ($request == 2) {
+} elseif ($request == 'like') {
   $id = $_POST["id"];
   mysqli_query($con,"UPDATE ideas SET likes = likes + 1 WHERE id ='".$id."'");
   echo "Update successfully";
   exit;
 
-} elseif ($request == 3) {
+} elseif ($request == 'dislike') {
   $id = $_POST["id"];
   mysqli_query($con,"UPDATE ideas SET dislikes = dislikes + 1 WHERE id ='".$id."'");
   echo "Update successfully";

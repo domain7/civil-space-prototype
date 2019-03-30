@@ -77,20 +77,20 @@
                                                         </div>
                                                     </div>
                                                     <div class='row no-gutters align-items-center ml-2 mb-1'>
-                                                        <div class='col-7'><button class='btn btn-outline-primary btn-block btn-lg'@click="vote('like',idea.id)"><i class='fa fa-fw fa-thumbs-up'></i></button></div>
+                                                        <div class='col-7'><button class='btn btn-outline-primary btn-block btn-lg' @click="like(idea.id)"><i class='fa fa-fw fa-thumbs-up'></i></button></div>
                                                         <div class='col-3 text-center'>
                                                             <span class='label'>{{ idea.likes }}</span>
                                                         </div>
                                                     </div>
                                                     <div class='row no-gutters align-items-center ml-2 mb-1'>
-                                                        <div class='col-7'><button class='btn btn-outline-primary btn-lg btn-block'@click="vote('dislike',idea.id)"><i class='fa fa-fw fa-thumbs-down fa-flip-horizontal'></i></button></div>
+                                                        <div class='col-7'><button class='btn btn-outline-primary btn-lg btn-block dislike' @click="dislike(idea.id); sendTitle(idea.title);"><i class='fa fa-fw fa-thumbs-down fa-flip-horizontal'></i></button></div>
                                                         <div class='col-3 text-center'>
                                                             <span class='label'>{{ idea.dislikes }}</span>
                                                         </div>
                                                     </div>
                                                     <div class='row'>
                                                         <div class='col-md-12'>
-                                                            <p class='label p-2 m-0'><a class='iteration-link' v-on:click.stop="ideaIteration()">Idea iterations <strong>18</strong></a></p>
+                                                            <p class='label p-2 m-0'><a class='iteration-link' v-on:click.stop="getIterations(idea.id); sendTitle(idea.title); sendID(idea.id);">Idea iterations <strong>{{idea.iterationCount}}</strong></a></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -105,77 +105,10 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" ref="addIdeaModal" id="add-idea-modal">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header border-bottom-0">
-                        <button type="button" class="close" data-dismiss="modal"> <span>×</span> </button>
-                    </div>
-                    <div class="modal-body p-5">
-                        <h4 class="modal-title text-center mb-4">Tell us about your idea</h4>
-                        <form>
-                            <div class="form-group"> <label>Give your idea a title</label> <input type="text" class="form-control" placeholder="Add a Childres Play Park" v-model='title'> </div>
-                            <div class="form-group"> <label>Describe your idea</label><br><textarea class="form-control" rows="5" v-model='description'></textarea></div>
-                            <div class="form-group"> <label>Your name (optional)</label> <input type="text" class="form-control" placeholder="" v-model='username'> </div>
-                            <div class="form-group"> <label>Your email </label> <input type="email" class="form-control" placeholder="" v-model='email'> </div>
-                            <p> This form collects your name and email so that we can send you updates about your  Check out our <a href="">Privacy Policy</a> and <a href="">Terms of Use</a> to see how we protect and manage your submitted data. </p>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                                <label class="form-check-label" for="defaultCheck1"> I consent to having Our City collect my name and email address.* </label>
-                            </div>
-                            <div class="row mt-4 text-center justify-content-center">
-                                <div class="col-sm-6 col-lg-4">
-                                    <button type="button" class="btn btn-primary btn-md btn-block mb-2" value='Add' @click='newIdea();'>Submit Your Idea</button>
-                                    <button type="button" class="btn btn-link" data-dismiss="modal">Cancel</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="iterate-idea-modal">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header border-bottom-0">
-                        <button type="button" class="close" data-dismiss="modal"> <span>×</span> </button>
-                    </div>
-                    <div class="modal-body p-5">
-                            <h5>You said No to:</h5>
-                            <h4 class="modal-title mb-3 ">Idea title....</h4>
-                            <h5 class="mb-2">What one thing would you change to make this an idea you could say Yes to?</h5>
-                            <form>
-                                <div class="form-group"><textarea class="form-control" rows="5"></textarea></div>
-                            </form>
-                            <p class="p-0">
-                                <strong>Other suggestions:</strong>
-                            </p>
-                        <div class="container">
-                            <div class="row border-top border-bottom py-2 align-items-center">
-                                <div class="col-md-9 col-auto mr-auto pl-0">
-                                    <label><small><span class="pr-2">3 hours ago </span><strong>User name</strong></small></label>
-                                    <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad </p>
-                                </div>
-                                <div class="col-md-2 col-auto">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col-9"><a class="btn btn-outline-primary btn-block btn-lg" href="#"><i class="fa fa-fw fa-thumbs-up"></i></a></div>
-                                        <div class="col-3 text-center">
-                                            <span class="label">48</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-4 text-center justify-content-center">
-                                <div class="col-sm-6 col-lg-4">
-                                    <button type="button" class="btn btn-primary btn-md btn-block mb-2">Submit Your Idea</button>
-                                    <button type="button" class="btn btn-link" data-dismiss="modal">Skip</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Modals -->
+        <?php include('partials/addIdeaModal.php') ?>
+        <?php include('partials/iterateIdeaModal.php') ?>
+        
     </div>
     <div class="py-5" id="footer">
         <div class="container">
@@ -199,6 +132,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="https://unpkg.com/vue-observe-visibility@0.4.2"></script>
 
     <script>
         var app = new Vue({
@@ -206,15 +140,20 @@
              
                 data: {
                     ideas: '', // this is for listing exsisting ideas
+                    iterations: '',
                     
                     // these are for the form inputs
+                    id: '',
                     title: '',
                     description: '',
                     username: '',
-                    email: ''
+                    email: '',
+                    comment: '',
+                    baseURL: window.location.origin,
+                    modalTitle: '',
+                    modalID: ''
                 },
                 mounted: function (){
-                    console.log('Hi!');
                     this.getIdeas();
                 },
                 methods: {
@@ -222,7 +161,6 @@
                         
                         axios.get('api/getIdeas.php')
                         .then(response => {
-                            
                             app.ideas = response.data
                             console.log(app.ideas);
                         })
@@ -234,7 +172,7 @@
                         if(this.username != '' && this.name != '' && this.email != ''){
 
                             let formData = new FormData();
-                            formData.append("request", 1)
+                            formData.append("request", "new")
                             formData.append("title", this.title)
                             formData.append("description", this.description)
                             formData.append("username", this.username)
@@ -250,7 +188,7 @@
                             .then(function (response) {
 
                                 // Fetch records
-                                // this.getIdeas();
+
                                 
                                 $('#add-idea-modal').modal('toggle');
                                 axios.get('api/getIdeas.php')
@@ -274,10 +212,10 @@
                                 alert('You are missing some information.');
                         }
                     },
-                    vote: function(type,id,dislikes){
-                        console.log(type);
+                    like: function(id){
+
                         console.log(id);
-                        $vote = (type == 'like') ? 2 : 3;
+                        $vote = 'like';
                         
                         console.log($vote);
                         let formData = new FormData();
@@ -290,10 +228,6 @@
                             config: {headers: {'Content-Type': 'multipart/form-data'}}
                         })
                         .then(function (response) {
-
-                            if (type == 'dislike'){
-                                $('#iterate-idea-modal').modal('toggle');
-                            }
 
 
                             axios.get('api/getIdeas.php')
@@ -310,10 +244,131 @@
 
 
                     },
-                    ideaIteration: function(ideaID){
-                        if ($('#iterate-idea-modal').not('.show')){
+                    dislike: function(id){
+                        console.log(id);
+                        $vote = 'dislike';
+                        
+                        console.log($vote);
+                        let formData = new FormData();
+                        formData.append("request", $vote);
+                        formData.append("id", id);
+                        axios({
+                            method: 'post',
+                            url: 'api/newIdea.php',
+                            data: formData,
+                            config: {headers: {'Content-Type': 'multipart/form-data'}}
+                        })
+                        .then(function (response) {
+
+
                             $('#iterate-idea-modal').modal('toggle');
-                        }
+
+                            axios.get('api/getIdeas.php')
+                            .then(response => {
+                                app.ideas = response.data
+                                console.log(app.ideas);
+                            })
+
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+
+
+                    },
+                    newIteration: function(){
+
+                        if(this.comment != ''){
+
+                            let formData = new FormData();
+                            formData.append("comment", this.comment)
+                            formData.append("ideaID", this.ideaID)
+
+
+                            axios({
+                                method: 'post',
+                                url: 'api/newIteration.php',
+                                data: formData,
+                                config: {headers: {'Content-Type': 'multipart/form-data'}}
+                            })
+                            .then(function (response) {
+                                // Close the modal
+                                $('#iterate-idea-modal').modal('toggle');
+
+                                // Fetch records  
+                                axios.get('api/getIdeas.php')
+                                .then(response => {
+                                    app.ideas = response.data
+                                    console.log(app.ideas);
+                                })
+
+                                // Empty values
+                                app.comment = '';
+                                app.id = '';
+
+                                // alert(response.data);
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                            }else{
+                                alert('You are missing some information.');
+                            }
+
+                    },
+                    iterationModalVisibility: function(isVisible, entry){
+                        this.isVisible = isVisible
+                        console.log(isVisible);
+                        
+                    },
+                    getIterations: function(ideaID){ //this will also open the modal
+
+                        
+                        axios.get(app.baseURL + '/api/getIterations.php?ideaID=' + ideaID)
+                        
+
+                        .then(response => {
+                            
+                            $('#iterate-idea-modal').modal('toggle');
+                            app.iterations = response.data
+                            // console.log(typeof app.iterations)
+                            console.log(response.data);
+
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                    },
+                    likeIteration: function(iterationID,ideaID){
+                        let formData = new FormData();
+                        formData.append("id", iterationID);
+                        axios({
+                            method: 'post',
+                            url: 'api/likeIteration.php',
+                            data: formData,
+                            config: {headers: {'Content-Type': 'multipart/form-data'}}
+                        })
+                        .then(function (response) {
+
+                            axios.get(app.baseURL + '/api/getIterations.php?ideaID=' + ideaID)
+                            .then(response => {
+                                app.iterations = response.data
+                                console.log(app.ideas);
+                            })
+
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                    },
+                    sendTitle: function(title){
+                        app.modalTitle = title
+
+                    },
+                    sendID: function(ID){
+                        app.modalID = ID
+
                     }
                 }
             })
@@ -321,6 +376,8 @@
         $("#idea-search").focus(function() {
             $('#add-button-region').toggleClass("invisible");
         });
+
+
 
 
         
