@@ -46,7 +46,7 @@
                     <div class="col-sm-12 col-md-12 col-lg-7" id="idea-region">
                         <form class="form-inline">
                             <div class="input-group w-100">
-                                <input type="text" class="form-control" id="idea-search" placeholder="Enter an idea or search for an existing one..." name="">
+                                <input type="text" class="form-control" id="idea-search" placeholder="Enter an idea or search for an existing one..." name="" v-on:keyup="showAddButton" v-model="search">
                                 <div class="input-group-append"><button class="btn btn-light" type="button"><i class="fa fa-search"></i></button></div>
                             </div>
                         </form>
@@ -62,7 +62,7 @@
                         </ul>
                         <div class="tab-content mt-2">
                             <div class="tab-pane fade active show" id="tabone" role="tabpanel">
-                                <div class='card mb-2' v-for="idea in ideas">
+                                <div class='card mb-2' v-for="idea in filteredIdeas" v-cloak>
                                         <div class='card-body p-0'>
                                             <div class='row no-gutters'>
                                                 <div class='col-sm-6 col-md-9 p-2'>
@@ -126,21 +126,29 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css"/>
+    
 
     <script src="//unpkg.com/@babel/polyfill@latest/dist/polyfill.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="https://unpkg.com/vue-observe-visibility@0.4.2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.2.0/anime.js"></script>
+    
 
     <script>
+        // highlight filter
+        Vue.filter('highlight', function(words, query){
+            var iQuery = new RegExp(query, "ig");
+            return words.toString().replace(iQuery, function(matchedTxt,a,b){
+                return ('<span class=\'highlight\'>' + matchedTxt + '</span>');
+            });
+        });
         var app = new Vue({
                 el: '#app',
              
                 data: {
-                    ideas: '', // this is for listing exsisting ideas
-                    iterations: '',
+                    ideas: [], // this is for listing exsisting ideas
+                    iterations: [],
                     
                     // these are for the form inputs
                     id: '',
@@ -151,7 +159,9 @@
                     comment: '',
                     baseURL: window.location.origin,
                     modalTitle: '',
-                    modalID: ''
+                    modalID: '',
+                    search: '',
+                    filterKey: ''
                 },
                 mounted: function (){
                     this.getIdeas();
@@ -293,7 +303,7 @@
                                 url: 'api/newIteration.php',
                                 data: formData,
                                 config: {headers: {'Content-Type': 'multipart/form-data'}}
-                                
+
                             })
                             .then(function (response) {
                                 // Close the modal
@@ -372,17 +382,23 @@
                     sendID: function(ID){
                         app.modalID = ID
 
+                    },
+                    showAddButton: function() {
+                        
+                        $('#add-button-region').removeClass("invisible");
+                    }
+                },
+                computed: {
+                    filteredIdeas: function(){
+                        // console.log(this.ideas)
+                        return this.ideas.filter((idea) => {
+                            return idea.title.match(this.search.toLowerCase()) || idea.description.match(this.search.toLowerCase());
+                        })
                     }
                 }
             })
 
-        $("#idea-search").focus(function() {
-            $('#add-button-region').toggleClass("invisible");
-        });
-
-
-
-
+        
         
     </script>
 </body>
