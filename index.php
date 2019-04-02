@@ -56,13 +56,14 @@
                             </div>
                         </div>
                         <ul class="nav nav-tabs">
-                            <li class="nav-item"> <a href="" class="nav-link active" data-toggle="tab" data-target="#tabone">Most Popular</a> </li>
-                            <li class="nav-item"> <a class="nav-link" href="" data-toggle="tab" data-target="#tabtwo">Most Recent</a> </li>
-                            <li class="nav-item"> <a href="" class="nav-link" data-toggle="tab" data-target="#tabthree">Most Divisive</a> </li>
+                            <li class="nav-item"> <a class="nav-link most-popular active" @click.stop="sortBy('-likes'), tabClick('most-popular')">Most Popular</a> </li>
+                            <li class="nav-item"> <a class="nav-link most-recent " @click.stop="sortBy('-id'), tabClick('most-recent')" >Most Recent</a> </li>
+                            <li class="nav-item"> <a class="nav-link most-divisive" @click.stop="sortBy('-dislikes'), tabClick('most-divisive')" >Most Divisive</a> </li>
                         </ul>
                         <div class="tab-content mt-2">
                             <div class="tab-pane fade active show" id="tabone" role="tabpanel">
-                                <div class='card mb-2' v-for="idea in filteredIdeas" v-cloak>
+ 
+                                <div class='card mb-2' v-for="idea in filteredIdeas" :key="idea.id" v-cloak>
                                         <div class='card-body p-0'>
                                             <div class='row no-gutters'>
                                                 <div class='col-sm-6 col-md-9 p-2'>
@@ -132,7 +133,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/vue-observe-visibility@0.4.2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.2.0/anime.js"></script>
+    <script src="https://unpkg.com/vue-cookies@1.5.12/vue-cookies.js"></script>
     
 
     <script>
@@ -148,6 +149,7 @@
              
                 data: {
                     ideas: [], // this is for listing exsisting ideas
+                    
                     iterations: [],
                     
                     // these are for the form inputs
@@ -161,10 +163,12 @@
                     modalTitle: '',
                     modalID: '',
                     search: '',
-                    filterKey: ''
+                    currentOrder: ''
+
                 },
                 mounted: function (){
                     this.getIdeas();
+                    
                 },
                 methods: {
                     getIdeas: function(){
@@ -173,6 +177,7 @@
                         .then(response => {
                             app.ideas = response.data
                             console.log(app.ideas);
+                            
                         })
                         .catch(function (error) {
                             console.log(error);
@@ -386,7 +391,54 @@
                     showAddButton: function() {
                         
                         $('#add-button-region').removeClass("invisible");
+                    },
+                    sortBy: function (key) {
+                        // console.log(this.ideas)
+                        function dynamicSort (property){
+                            var sortOrder = 1;
+                            if(property[0] === "-") {
+                                sortOrder = -1;
+                                property = property.substr(1);
+                            }
+                            return function (a,b) {
+                                var result = (parseInt(a[property]) < parseInt(b[property])) ? -1 : (parseInt(a[property]) > parseInt(b[property])) ? 1 : 0;
+                                return result * sortOrder;
+                            }
+                        }
+                        
+                        return app.ideas.sort(dynamicSort(key));
+  
+                    },
+                    compareValues: function (key, order='asc') {
+                        return function(a, b) {
+                            if(!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+                                // property doesn't exist on either object
+                                return 0;
+                            }
+
+                            const varA = (typeof a[key] === 'string') ?
+                                a[key].toUpperCase() : a[key];
+                            const varB = (typeof b[key] === 'string') ?
+                                b[key].toUpperCase() : b[key];
+
+                            let comparison = 0;
+                            if (varA > varB) {
+                                comparison = 1;
+                            } else if (varA < varB) {
+                                comparison = -1;
+                            }
+                            return (
+                                (order == 'desc') ? (comparison * -1) : comparison
+                            );
+                        };
+                    }, 
+                    tabClick: function (thisTab){
+                        $('a.nav-link.active').toggleClass('active');
+                        $('a.nav-link.'+thisTab).toggleClass('active');
                     }
+
+            
+
                 },
                 computed: {
                     filteredIdeas: function(){
@@ -397,6 +449,9 @@
                     }
                 }
             })
+
+            
+            
 
         
         
