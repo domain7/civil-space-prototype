@@ -22,13 +22,13 @@ if($request == "new"){
   mysqli_query($con,"INSERT INTO ideas(title,description,username,email) VALUES('".$title."','".$description."','".$username."','".$email."')");
   
   exit;
-} elseif ($request == 'like') {
+} elseif ($request == 'liked') {
   $id = $_POST["id"];
   mysqli_query($con,"UPDATE ideas SET likes = likes + 1 WHERE id ='".$id."'");
   echo "Update successfully";
   exit;
 
-} elseif ($request == 'dislike') {
+} elseif ($request == 'disliked') {
   $id = $_POST["id"];
   mysqli_query($con,"UPDATE ideas SET dislikes = dislikes + 1 WHERE id ='".$id."'");
   echo "Update successfully";

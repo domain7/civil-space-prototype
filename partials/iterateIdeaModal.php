@@ -24,7 +24,7 @@
                           </div>
                           <div class="col-md-2 col-auto">
                               <div class="row no-gutters align-items-center">
-                                  <div class="col-9"><a class="btn btn-outline-primary btn-block btn-lg" @click.stop="likeIteration(iteration.id,iteration.idea_id)"><i class="fa fa-fw fa-thumbs-up"></i></a></div>
+                                  <div class="col-9"><button class="iteration-like btn btn-outline-primary btn-block btn-lg" v-bind:class="iterationLikeChecker(iteration.id)" @click.stop="likeIteration(iteration.id,iteration.idea_id)" :disabled="isDisabled(iteration.id, 1)"><i class="fa fa-fw fa-thumbs-up"></i></button></div>
                                   <div class="col-3 text-center">
                                       <span class="label">{{iteration.likes}}</span>
                                   </div>

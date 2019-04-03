@@ -10010,3 +10010,24 @@ a.nav-link {
     border-bottom: 4px #0F2563 solid !important;
     font-size: 1rem;
 }
+
+.btn-outline-primary.disabled.liked,
+.btn-outline-primary.liked:disabled,
+button.liked {
+    background-color: green !important;
+    border-color: green !important;
+    color: white !important;
+}
+
+button.iteration-like.btn-outline-primary:hover,
+button.iteration-like:disabled:hover {
+    color: white !important;
+}
+
+.btn-outline-primary.disabled.disliked,
+.btn-outline-primary.disliked:disabled,
+button.disliked {
+    background-color: red !important;
+    border-color: red !important;
+    color: white !important;
+}

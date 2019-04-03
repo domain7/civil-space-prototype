@@ -78,13 +78,13 @@
                                                         </div>
                                                     </div>
                                                     <div class='row no-gutters align-items-center ml-2 mb-1'>
-                                                        <div class='col-7'><button class='btn btn-outline-primary btn-block btn-lg ' @click="like(idea.id)"><i class='fa fa-fw fa-thumbs-up'></i></button></div>
+                                                        <div class='col-7'><button class='btn btn-outline-primary btn-block btn-lg ' v-bind:class="voteChecker(idea.id, 'liked')" @click="like(idea.id)" :disabled="isDisabled(idea.id)"><i class='fa fa-fw fa-thumbs-up'></i></button></div>
                                                         <div class='col-3 text-center'>
                                                             <span class='label'>{{ idea.likes }}</span>
                                                         </div>
                                                     </div>
                                                     <div class='row no-gutters align-items-center ml-2 mb-1'>
-                                                        <div class='col-7'><button class='btn btn-outline-primary btn-lg btn-block dislike' @click="dislike(idea.id); sendTitle(idea.title); sendID(idea.id)"><i class='fa fa-fw fa-thumbs-down fa-flip-horizontal'></i></button></div>
+                                                        <div class='col-7'><button class='btn btn-outline-primary btn-lg btn-block dislike' v-bind:class="voteChecker(idea.id, 'disliked')" @click="dislike(idea.id); sendTitle(idea.title); sendID(idea.id)" :disabled="isDisabled(idea.id)"><i class='fa fa-fw fa-thumbs-down fa-flip-horizontal'></i></button></div>
                                                         <div class='col-3 text-center'>
                                                             <span class='label'>{{ idea.dislikes }}</span>
                                                         </div>
@@ -165,7 +165,8 @@
                     modalID: '',
                     search: '',
                     currentOrder: '',
-                    userVotes: []
+                    userVotes: [],
+                    iterationLikes: []
 
                 },
                 mounted: function (){
@@ -174,6 +175,15 @@
                     if (Cookies.get('votes') == undefined) {
                         Cookies.set('votes','');
                         console.log("cookie created:"+Cookies.get('votes'));
+                    } else {
+                        this.userVotes = Cookies.getJSON('votes');
+                    }
+                    // set iteration likes cookie
+                    if (Cookies.get('iterationLikes') == undefined) {
+                        Cookies.set('iterationLikes','');
+                        console.log("cookie created:"+Cookies.get('iterationLikes'));
+                    } else {
+                        this.iterationLikes = Cookies.getJSON('iterationLikes');
                     }
                     
                     
@@ -250,12 +260,19 @@
                     },
                     like: function(id){
 
-                        console.log(id);
-                        $vote = 'like';
+                        // console.log(id);
                         
-                        console.log($vote);
+                        // update userVotes array
+                        this.userVotes.push(
+                            { 'id' : id, 'vote' : 'liked' }
+                        );
+                        // disable voting buttons
+                        // change the appearnce of the button the user selected
+                        // save vote to cookie
+                        
+                        // console.log(vote);
                         let formData = new FormData();
-                        formData.append("request", $vote);
+                        formData.append("request", 'liked');
                         formData.append("id", id);
                         axios({
                             method: 'post',
@@ -282,11 +299,12 @@
                     },
                     dislike: function(id){
                         console.log(id);
-                        $vote = 'dislike';
-                        
-                        console.log($vote);
+                            // update userVotes array
+                        this.userVotes.push(
+                            { 'id' : id, 'vote' : 'disliked' }
+                        );
                         let formData = new FormData();
-                        formData.append("request", $vote);
+                        formData.append("request", 'disliked');
                         formData.append("id", id);
                         axios({
                             method: 'post',
@@ -380,6 +398,11 @@
                         });
                     },
                     likeIteration: function(iterationID,ideaID){
+                        console.log(iterationID)
+                        this.iterationLikes.push(
+                            { 'id' : iterationID }
+                        );
+                        Cookies.set("iterationLikes", JSON.stringify(this.iterationLikes));
                         let formData = new FormData();
                         formData.append("id", iterationID);
                         axios({
@@ -440,21 +463,50 @@
                         $('a.nav-link.active').toggleClass('active');
                         $('a.nav-link.'+thisTab).toggleClass('active');
                     },
-                    cookieSetter: function (id,vote){
-
-                        this.votes.push(
-                            { 'id' : id, 'vote' : vote }
-                        );
-                        Cookies.set("votes", JSON.stringify(votes));
+                    voteChecker: function (id,btnType) {
+                        // check for a vote
+                        ideaObj = _.find(app.userVotes, {'id':id});
+                        // console.log(ideaObj)
+                        if ((ideaObj != undefined) && (ideaObj.vote == btnType)){
+                            return ideaObj.vote+" disabled"
+                        } else if (ideaObj != undefined) {
+                            return "disabled"
+                        }
+                        
                     },
-                    voteChecker: function (id) {
-                        var ideaObj = _.find(app.ideas, {'id':'26'});
-                        var thisVot = ideaObj.vote;
+                    iterationLikeChecker: function (id) {
+                        // check for a vote
+                        iterationObj = _.find(app.iterationLikes, {'id':id});
+                        // console.log(ideaObj)
+                        if (iterationObj != undefined) {
+                            return "liked disabled"
+                        }
+                        
                     },
                     clearSearch: function(){
                         
                         console.log(this.search)
                         this.search = ''
+                    },
+                    isDisabled: function(id,type){
+                        switch (type) {
+                            case undefined:
+                                ideaObj = _.find(app.userVotes, {'id':id});
+                                if (ideaObj != undefined){
+                                    return 1
+                                }
+                                break;
+                            case 1:
+                                iterationObj = _.find(app.iterationLikes, {'id':id});
+                                if (iterationObj != undefined){
+                                    return 1
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        
+                        
                     }
 
             
@@ -462,20 +514,24 @@
                 },
                 computed: {
                     filteredIdeas: function(){
-                        // console.log(this.ideas)
+                        console.log(this.search.length)
                         return this.ideas.filter((idea) => {
                             return idea.title.match(this.search.toLowerCase()) || idea.description.match(this.search.toLowerCase());
                         })
+                    },
+                    voteButtonState: function(){
+
                     }
                 },
-                // watch: {
-                //     ideas: {
-                //         handler: function (val, oldVal) {
-                //             console.log('a thing changed')
-                //         },
-                //         deep: true
-                //     }
-                // },
+                watch: {
+                    userVotes: {
+                        handler: function (val, oldVal) {
+                            Cookies.set("votes", JSON.stringify(this.userVotes));
+                            console.log(Cookies.get('votes'))
+                        },
+                        deep: true
+                    }
+                }
             })
 
             
