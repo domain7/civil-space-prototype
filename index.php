@@ -46,13 +46,13 @@
                     <div class="col-sm-12 col-md-12 col-lg-7" id="idea-region">
                         <form class="form-inline">
                             <div class="input-group w-100">
-                                <input type="text" class="form-control" id="idea-search" placeholder="Enter an idea or search for an existing one..." name="" v-on:keyup="showAddButton" v-model="search">
+                                <input type="text" class="form-control" id="idea-search" placeholder="Enter an idea or search for an existing one..." name="" v-on:keyup="showAddButton" v-model="search" ref='searchField'>
                                 <div class="input-group-append"><button class="btn btn-light" type="button"><i class="fa fa-search"></i></button></div>
                             </div>
                         </form>
                         <div id="add-button-region" class="row text-center mt-3 invisible">
                             <div class="col-md-12">
-                                <p>Vote for an existing idea&nbsp; - or -<a class="btn btn-secondary ml-2" href="#" data-toggle="modal" data-target="#add-idea-modal" id="add-idea-btn"><i class="fa fa-plus mr-2"></i> Add a New Idea</a></p>
+                                <p>Vote for an existing idea&nbsp; - or -<a class="btn btn-secondary ml-2" href="" data-toggle="modal" data-target="#add-idea-modal" id="add-idea-btn" @click="sendSearch(search) "><i class="fa fa-plus mr-2"></i> Add a New Idea</a></p>
                             </div>
                         </div>
                         <ul class="nav nav-tabs">
@@ -78,7 +78,7 @@
                                                         </div>
                                                     </div>
                                                     <div class='row no-gutters align-items-center ml-2 mb-1'>
-                                                        <div class='col-7'><button class='btn btn-outline-primary btn-block btn-lg' @click="like(idea.id)"><i class='fa fa-fw fa-thumbs-up'></i></button></div>
+                                                        <div class='col-7'><button class='btn btn-outline-primary btn-block btn-lg ' @click="like(idea.id)"><i class='fa fa-fw fa-thumbs-up'></i></button></div>
                                                         <div class='col-3 text-center'>
                                                             <span class='label'>{{ idea.likes }}</span>
                                                         </div>
@@ -133,7 +133,8 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/vue-observe-visibility@0.4.2"></script>
-    <script src="https://unpkg.com/vue-cookies@1.5.12/vue-cookies.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
     
 
     <script>
@@ -163,11 +164,18 @@
                     modalTitle: '',
                     modalID: '',
                     search: '',
-                    currentOrder: ''
+                    currentOrder: '',
+                    userVotes: []
 
                 },
                 mounted: function (){
                     this.getIdeas();
+                    console.log("cookie:"+Cookies.get('votes'));
+                    if (Cookies.get('votes') == undefined) {
+                        Cookies.set('votes','');
+                        console.log("cookie created:"+Cookies.get('votes'));
+                    }
+                    
                     
                 },
                 methods: {
@@ -205,11 +213,24 @@
                                 // Fetch records
 
                                 
-                                $('#add-idea-modal').modal('toggle');
+                                
                                 axios.get('api/getIdeas.php')
                                 .then(response => {
                                     app.ideas = response.data
                                     console.log(app.ideas);
+                                    
+                                    $('#idea-search').val('')
+
+                                    $('#add-idea-modal').modal('toggle');
+                                    $('a.nav-link.active').toggleClass('active');
+                                    $('a.nav-link.most-recent').toggleClass('active');
+                                    
+                                    app.search = ''
+                                    
+                                    
+
+                                
+                                    app.sortBy('-id')
                                 })
 
                                 // Empty values
@@ -380,6 +401,12 @@
                             console.log(error);
                         });
                     },
+                    sendSearch: function(arg){
+                        app.title = arg
+                        console.log(app.title)
+
+                    }
+                    ,
                     sendTitle: function(title){
                         app.modalTitle = title
 
@@ -408,33 +435,26 @@
                         
                         return app.ideas.sort(dynamicSort(key));
   
-                    },
-                    compareValues: function (key, order='asc') {
-                        return function(a, b) {
-                            if(!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
-                                // property doesn't exist on either object
-                                return 0;
-                            }
-
-                            const varA = (typeof a[key] === 'string') ?
-                                a[key].toUpperCase() : a[key];
-                            const varB = (typeof b[key] === 'string') ?
-                                b[key].toUpperCase() : b[key];
-
-                            let comparison = 0;
-                            if (varA > varB) {
-                                comparison = 1;
-                            } else if (varA < varB) {
-                                comparison = -1;
-                            }
-                            return (
-                                (order == 'desc') ? (comparison * -1) : comparison
-                            );
-                        };
                     }, 
                     tabClick: function (thisTab){
                         $('a.nav-link.active').toggleClass('active');
                         $('a.nav-link.'+thisTab).toggleClass('active');
+                    },
+                    cookieSetter: function (id,vote){
+
+                        this.votes.push(
+                            { 'id' : id, 'vote' : vote }
+                        );
+                        Cookies.set("votes", JSON.stringify(votes));
+                    },
+                    voteChecker: function (id) {
+                        var ideaObj = _.find(app.ideas, {'id':'26'});
+                        var thisVot = ideaObj.vote;
+                    },
+                    clearSearch: function(){
+                        
+                        console.log(this.search)
+                        this.search = ''
                     }
 
             
@@ -447,7 +467,15 @@
                             return idea.title.match(this.search.toLowerCase()) || idea.description.match(this.search.toLowerCase());
                         })
                     }
-                }
+                },
+                // watch: {
+                //     ideas: {
+                //         handler: function (val, oldVal) {
+                //             console.log('a thing changed')
+                //         },
+                //         deep: true
+                //     }
+                // },
             })
 
             
