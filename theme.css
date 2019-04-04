@@ -10031,3 +10031,7 @@ button.disliked {
     border-color: red !important;
     color: white !important;
 }
+
+.flip-list-move {
+    transition: transform 1s;
+}
