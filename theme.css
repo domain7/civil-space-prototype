@@ -10035,3 +10035,7 @@ button.disliked {
 .flip-list-move {
     transition: transform 1s;
 }
+
+.highlightText {
+    background-color: yellow;
+}
