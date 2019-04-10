@@ -411,24 +411,11 @@ var app = new Vue({
 
     },
     computed: {
-        // filteredIdeas: function() {
-
-        //     return this.ideas.filter((idea) => {
-
-        //         return idea.title.find(this.search.toUpperCase());
-
-        //     })
-        // }
         filteredIdeas: function() {
             let filtered = this.ideas;
             if (this.search) {
                 filtered = this.ideas.filter(
-                    m => m.title.toLowerCase().indexOf(this.search) > -1
-                );
-            }
-            if (this.select) {
-                filtered = filtered.filter(
-                    m => m.desctription.toLowerCase() === this.select.toLowerCase()
+                    m => m.mergedText.toLowerCase().indexOf(this.search) > -1
                 );
             }
             return filtered;
